@@ -1,6 +1,6 @@
-﻿namespace GeneticAlgorithm;
+﻿namespace GeneticAlgorithm.BasicGA;
 
-public class GeneticAlgorithm<T> where T : class, IEntity, new()
+public class BasicGeneticAlgorithm<T> where T : class, IEntity, new()
 {
     public int NumberOfIterations { get; set; }
     public int PopulationSize { get; set; }
@@ -11,7 +11,7 @@ public class GeneticAlgorithm<T> where T : class, IEntity, new()
     private T BestFit = null;
     private Random Random;
 
-    public GeneticAlgorithm(int numberOfIterations, int populationSize, double crossbreedProb, double mutationProb)
+    public BasicGeneticAlgorithm(int numberOfIterations, int populationSize, double crossbreedProb, double mutationProb)
     {
         NumberOfIterations = numberOfIterations;
         PopulationSize = populationSize;
@@ -67,10 +67,7 @@ public class GeneticAlgorithm<T> where T : class, IEntity, new()
             var newEntity = new T();
             newEntity.Evaluate();
             
-            if (BestFit == null)
-                BestFit = newEntity;
-
-            else if (newEntity.Fitness > BestFit.Fitness)
+            if (BestFit == null || newEntity.Fitness > BestFit.Fitness)
                 BestFit = newEntity;
 
             Population.Add(newEntity);

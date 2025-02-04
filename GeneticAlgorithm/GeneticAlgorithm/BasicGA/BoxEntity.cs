@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace GeneticAlgorithm;
+namespace GeneticAlgorithm.BasicGA;
 
 public class BoxEntity : IEntity, IComparable<BoxEntity>
 {

@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithm;
+﻿namespace GeneticAlgorithm.BasicGA;
 
 public interface IEntity
 {
