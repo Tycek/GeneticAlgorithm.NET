@@ -26,5 +26,10 @@ public  class Location
     {
         return Math.Min(0, product.Weight - MaxWeight);
     }
+
+    public bool ProductFits(Product product)
+    {
+        return product.Volume <= Volume;
+    }
 }
 

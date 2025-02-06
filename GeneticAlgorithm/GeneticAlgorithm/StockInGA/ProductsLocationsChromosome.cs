@@ -6,29 +6,33 @@ using System.Threading.Tasks;
 
 namespace GeneticAlgorithm.StockInGA;
 
-public class ProductsLocationsChromosome : IEntity, IComparable<ProductsLocationsChromosome>
+public class ProductsLocationsChromosome : IComparable<ProductsLocationsChromosome>
 {
     public int[] Values { get; set; }
+    public bool[] ProductFits { get; set; }
     public decimal Fitness { get; set; }
 
     public int NumberOfProducts { get; set; }
     public List<Product> Products { get; set; }
 
-    public ProductsLocationsChromosome(int numberOfProducts, List<Product> products)
+    public ProductsLocationsChromosome(List<Product> products)
     {
-        NumberOfProducts = numberOfProducts;
         Products = products;
-        Values = new int[NumberOfProducts];
+        Values = new int[products.Count];
+        ProductFits = new bool[products.Count];
     }
 
-    public IEntity Clone(IEntity sourceEntity)
+    public ProductsLocationsChromosome Clone(ProductsLocationsChromosome sourceEntity)
     {
-        IEntity result = new ProductsLocationsChromosome(sourceEntity.NumberOfProducts, sourceEntity.Products);
+        ProductsLocationsChromosome result = new (sourceEntity.Products);
 
         for (int i = 0; i < Values.Length; i++)
         {
             result.Values[i] = sourceEntity.Values[i];
+            result.ProductFits[i] = sourceEntity.ProductFits[i];
         }
+
+        result.Fitness = sourceEntity.Fitness;
 
         return result;
     }
@@ -40,7 +44,7 @@ public class ProductsLocationsChromosome : IEntity, IComparable<ProductsLocation
 
     public override string ToString()
     {
-        return $"Fitness: {Fitness} Values: ({string.Join(',', Values)})";
+        return $"Fitness: {Fitness} Values: ({string.Join(',', Values)}) Fits: ({string.Join(',', ProductFits)})";
     }
 }
 
