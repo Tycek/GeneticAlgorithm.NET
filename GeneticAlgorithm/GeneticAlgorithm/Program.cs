@@ -12,16 +12,17 @@ internal class Program
         /*BasicGeneticAlgorithm<BoxEntity> ga = new BasicGeneticAlgorithm<BoxEntity>(500, 10, 0.8, 0.1);
         ga.Optimize();*/
 
-        List<Location> locations = GenerateLocations(2000);
-        List<Product> products = GenerateProducts(10, locations);
+        List<Location> locations = GenerateLocations(10000);
+        List<Product> products = GenerateProducts(5, locations);
 
         //Nyní všechna řešení ve výsledku zkonvergují k jedné hodnotě. Bude potřeba přihodit kompletní rekombinaci chormozomů s určitou pravděpodobností.
         //Kompletní rekombinace nepomohla
+        //Možná by pomohl lepší init -> navrhnout prvně lokace, které jsou domovskými lokacemi a zároveň se tam vlezou a pak se pokusit najít lepší kombinaci
         for (int i = 0; i < 10; i++)
         {
             var sw = new Stopwatch();
             sw.Start();
-            StockInGeneticAlgorithm a = new StockInGeneticAlgorithm(1000, 400, 0.8, 0.9, 0.05, 20, locations);
+            StockInGeneticAlgorithm a = new StockInGeneticAlgorithm(1000, 400, 0.8, 0.9, 0.05, 10, locations);
             var bestFit = a.Optimize(products);
             Console.WriteLine($"Attempt {i} - Best fit: {bestFit}");
             sw.Stop();
@@ -68,7 +69,7 @@ internal class Program
                 HomeLocations = new List<int>()
             };
 
-            int numberOfHomeLocations = random.Next(1, 10);
+            int numberOfHomeLocations = random.Next(1, 100);
 
             for (int i = 0; i < numberOfHomeLocations; i++)
             {

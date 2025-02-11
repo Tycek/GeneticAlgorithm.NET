@@ -71,7 +71,7 @@ public class StockInGeneticAlgorithm
             else
                 numberOfIterationsWithNoChange = 0;
 
-            //Console.WriteLine($"Iterace {iteration}: BestFit {BestFit}");
+            Console.WriteLine($"Iterace {iteration}: BestFit {BestFit}");
             //Console.ReadLine();
 
             iteration++;
@@ -229,7 +229,7 @@ public class StockInGeneticAlgorithm
         for (int i = 0; i < Products.Count; i++)
         {
             var p = Products[i];
-            var l = Locations.First(x => x.Id ==BestFit.Values[i]);
+            var l = Locations.First(x => x.Id == BestFit.Values[i]);
 
             Console.WriteLine($"{p.Code} -> Volume: {p.Volume}, Weight: {p.Weight}");
             Console.WriteLine($"Best location: Volume: {l.Volume}, Max weight: {l.MaxWeight}, Priority: {l.Priority}, Home location? {p.HomeLocations.Contains(l.Id)}");
