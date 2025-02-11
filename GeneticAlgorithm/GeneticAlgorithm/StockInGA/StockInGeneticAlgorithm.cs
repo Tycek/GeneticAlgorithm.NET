@@ -1,4 +1,6 @@
-﻿namespace GeneticAlgorithm.StockInGA;
+﻿using System.Diagnostics;
+
+namespace GeneticAlgorithm.StockInGA;
 
 public class StockInGeneticAlgorithm
 {
@@ -7,21 +9,25 @@ public class StockInGeneticAlgorithm
     public double MaxIterationsWithNoChanges { get; set; }
     public double MutationProbability { get; set; }
     public double PercentageOfSelection { get; set; }
+    public double RearrangeMutationProbability { get; set; }
 
     public List<Location> Locations { get; set; }
     public List<Product> Products { get; set; }
+
+    public Dictionary<string, List<Location>> LocationsForProducts { get; set; } = new();
 
     private List<ProductsLocationsChromosome> Population = new();
     private ProductsLocationsChromosome BestFit = null;
     private Random Random;
 
-    public StockInGeneticAlgorithm(int numberOfIterations, int populationSize, double mutationProb, double percentageOfSelection, int maxIterationsWithNoChanges, List<Location> locations)
+    public StockInGeneticAlgorithm(int numberOfIterations, int populationSize, double mutationProb, double rearrangeMutationProb, double percentageOfSelection, int maxIterationsWithNoChanges, List<Location> locations)
     {
         NumberOfIterations = numberOfIterations;
         PopulationSize = populationSize;
         MutationProbability = mutationProb;
         PercentageOfSelection = percentageOfSelection;
         MaxIterationsWithNoChanges = maxIterationsWithNoChanges;
+        RearrangeMutationProbability = rearrangeMutationProb;
         Locations = locations;
         Random = new Random();
     }
@@ -31,38 +37,49 @@ public class StockInGeneticAlgorithm
         Products = products;
 
         Init(products);
-        Summary();
+
+        foreach (Product product in Products)
+        {
+            LocationsForProducts.Add(product.Code, Locations.Where(x => x.ProductFits(product)).ToList());
+        }
+        //IterationSummary();
 
         int iteration = 1;
         int numberOfIterationsWithNoChange = 0;
 
         while (iteration <= NumberOfIterations)
         {
+            var sw = new Stopwatch();
+            //sw.Start();
             if (numberOfIterationsWithNoChange == MaxIterationsWithNoChanges)
             {
-                Console.WriteLine("Stagnation count reached. Ending optimization.");
+                Console.WriteLine($"Stagnation count reached. Ending optimization on iteration {iteration}.");
                 break;
             }
 
-            Population = Population.OrderBy(x => x.Fitness).ToList();
+            Population = Population.OrderByDescending(x => x.Fitness).ToList();
 
             var selectedPopulation = Population.Take((int)(PopulationSize * PercentageOfSelection)).ToList();
 
             Population = Repopulate(selectedPopulation);
 
             decimal oldBestFit = BestFit.Fitness;
-            BestFit = Population.Where(x => x.Fitness == Population.Select(y => y.Fitness).Min()).First();
+            BestFit = Population.Where(x => x.Fitness == Population.Select(y => y.Fitness).Max()).First();
 
             if (oldBestFit == BestFit.Fitness)
                 numberOfIterationsWithNoChange++;
+            else
+                numberOfIterationsWithNoChange = 0;
 
-            Console.WriteLine($"Iterace {iteration}: BestFit {BestFit}");
+            //Console.WriteLine($"Iterace {iteration}: BestFit {BestFit}");
             //Console.ReadLine();
 
             iteration++;
+            //sw.Stop();
+            //Console.WriteLine($"{sw.ElapsedMilliseconds} ms");
         }
 
-        Summary();
+        FinalSummary();
         return BestFit;
     }
 
@@ -72,7 +89,7 @@ public class StockInGeneticAlgorithm
 
         while (newPopulation.Count < PopulationSize)
         {
-            (var parent1, var parent2) = ChooseParents(selectedPopulation);
+            (var parent1, var parent2) = ChooseParents(newPopulation);
 
             (var child1, var child2) = Crossover(parent1, parent2);
 
@@ -184,12 +201,15 @@ public class StockInGeneticAlgorithm
     {
         ProductsLocationsChromosome result = new(entity.Products);
         result.Clone(entity);
+        var random = Random.NextDouble();
 
         for (int i = 0; i < entity.Values.Length; i++)
         {
-            if (!result.ProductFits.ElementAt(i)) 
+            if (/*!result.ProductFits.ElementAt(i) ||*/ random < RearrangeMutationProbability) 
             {
-                var suitableLocation = Locations.FirstOrDefault(x => x.ProductFits(entity.Products.ElementAt(i)) && !entity.Values.Contains(x.Id));
+                //var suitableLocations = Locations.Where(x => x.ProductFits(entity.Products.ElementAt(i)) && !entity.Values.Contains(x.Id)).ToList();
+                var suitableLocation = LocationsForProducts[Products[i].Code].ElementAt(Random.Next(0, LocationsForProducts[Products[i].Code].Count));
+                //var suitableLocation = Locations.ElementAt(Random.Next(0, Locations.Count));
                 result.Values[i] = suitableLocation == null ? result.Values[i] : suitableLocation.Id;
                 result.ProductFits[i] = suitableLocation == null ? result.ProductFits[i] : suitableLocation.ProductFits(entity.Products.ElementAt(i));
             }
@@ -198,10 +218,25 @@ public class StockInGeneticAlgorithm
         return result;
     }
 
-    private void Summary()
+    private void IterationSummary()
     {
         Console.WriteLine($"Best fit: {BestFit}");
         Console.WriteLine($"Avg fitness: {Population.Average(x => x.Fitness)}");
+    }
+
+    private void FinalSummary()
+    {
+        for (int i = 0; i < Products.Count; i++)
+        {
+            var p = Products[i];
+            var l = Locations.First(x => x.Id ==BestFit.Values[i]);
+
+            Console.WriteLine($"{p.Code} -> Volume: {p.Volume}, Weight: {p.Weight}");
+            Console.WriteLine($"Best location: Volume: {l.Volume}, Max weight: {l.MaxWeight}, Priority: {l.Priority}, Home location? {p.HomeLocations.Contains(l.Id)}");
+        }
+
+            
+        
     }
 }
 

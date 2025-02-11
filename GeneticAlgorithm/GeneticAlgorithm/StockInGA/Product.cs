@@ -15,7 +15,7 @@ public class Product
 
     public int CalculateHomeLocationBonus(Location location)
     {
-        return HomeLocations.Contains(location.Id) ? 2 : 0;
+        return HomeLocations.Contains(location.Id) ? 1000 : 0;
     }
 }
 

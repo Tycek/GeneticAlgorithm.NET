@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using GeneticAlgorithm.BasicGA;
 using GeneticAlgorithm.StockInGA;
 
@@ -11,13 +12,21 @@ internal class Program
         /*BasicGeneticAlgorithm<BoxEntity> ga = new BasicGeneticAlgorithm<BoxEntity>(500, 10, 0.8, 0.1);
         ga.Optimize();*/
 
-        List<Location> locations = GenerateLocations(1000);
-        List<Product> products = GenerateProducts(7, locations);
+        List<Location> locations = GenerateLocations(2000);
+        List<Product> products = GenerateProducts(10, locations);
 
         //Nyní všechna řešení ve výsledku zkonvergují k jedné hodnotě. Bude potřeba přihodit kompletní rekombinaci chormozomů s určitou pravděpodobností.
-
-        StockInGeneticAlgorithm a = new StockInGeneticAlgorithm(1000, 400, 0.2, 0.5, 200, locations);
-        a.Optimize(products);
+        //Kompletní rekombinace nepomohla
+        for (int i = 0; i < 10; i++)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            StockInGeneticAlgorithm a = new StockInGeneticAlgorithm(1000, 400, 0.8, 0.9, 0.05, 20, locations);
+            var bestFit = a.Optimize(products);
+            Console.WriteLine($"Attempt {i} - Best fit: {bestFit}");
+            sw.Stop();
+            Console.WriteLine($"{sw.ElapsedMilliseconds} ms");
+        }
     }
 
     private static List<Location> GenerateLocations(int numberOfLocations)

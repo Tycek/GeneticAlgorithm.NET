@@ -19,7 +19,7 @@ public  class Location
 
     public decimal CalculateFreeVolume(Product product)
     {
-        return Volume - product.Volume;
+        return Volume - product.Volume < 0 ? 999999 : 0;
     }
 
     public decimal CalculateWeightPenalty(Product product)
