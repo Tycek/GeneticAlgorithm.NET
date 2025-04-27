@@ -10,12 +10,12 @@ public class Product
 {
     public string Code { get; set; }
     public decimal Volume { get; set; }
-    public List<int> HomeLocations { get; set; }
+    public List<Location> HomeLocations { get; set; }
     public decimal Weight { get; set; }
 
-    public int CalculateHomeLocationBonus(Location location)
+    public bool IsHomeLocation(Location location)
     {
-        return HomeLocations.Contains(location.Id) ? 1000 : 0;
+        return HomeLocations.Select(x => x.Id).Contains(location.Id);
     }
 }
 

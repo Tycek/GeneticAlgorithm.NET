@@ -19,17 +19,22 @@ public  class Location
 
     public decimal CalculateFreeVolume(Product product)
     {
-        return Volume - product.Volume < 0 ? 999999 : 0;
+        return Volume - product.Volume < 0 ? 999999 : Volume - product.Volume;
     }
 
     public decimal CalculateWeightPenalty(Product product)
     {
-        return Math.Min(0, product.Weight - MaxWeight);
+        return MaxWeight - product.Weight < 0 ? 999999 : 0;
     }
 
     public bool ProductFits(Product product)
     {
         return product.Volume <= Volume;
+    }
+
+    public override string ToString()
+    {
+        return Id.ToString();
     }
 }
 

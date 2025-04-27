@@ -22,11 +22,12 @@ internal class Program
         {
             var sw = new Stopwatch();
             sw.Start();
-            StockInGeneticAlgorithm a = new StockInGeneticAlgorithm(1000, 400, 0.8, 0.9, 0.05, 10, locations);
+            StockInGeneticAlgorithm a = new StockInGeneticAlgorithm(1000, 1000, 0.1, 0.8, 0.9, 40, locations);
             var bestFit = a.Optimize(products);
             Console.WriteLine($"Attempt {i} - Best fit: {bestFit}");
             sw.Stop();
             Console.WriteLine($"{sw.ElapsedMilliseconds} ms");
+            Console.WriteLine("-----------------------");
         }
     }
 
@@ -66,14 +67,14 @@ internal class Program
                 Code = $"P{productNumber}",
                 Weight = random.Next(5, 20),
                 Volume = random.Next(5, 100),
-                HomeLocations = new List<int>()
+                HomeLocations = new List<Location>()
             };
 
-            int numberOfHomeLocations = random.Next(1, 100);
+            int numberOfHomeLocations = random.Next(1, 200);
 
             for (int i = 0; i < numberOfHomeLocations; i++)
             {
-                newProduct.HomeLocations.Add(locations.ElementAt(random.Next(0, locations.Count)).Id);
+                newProduct.HomeLocations.Add(locations.ElementAt(random.Next(0, locations.Count)));
             }
 
             result.Add(newProduct);
